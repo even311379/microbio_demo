@@ -84,8 +84,8 @@ def microbio_app1():
         2. 當你將滑鼠移到任意圖表上面時，你可以看到modebar,你可以點選看看玩玩各自的功能，
         3. 如果你不喜歡某些modebar，我可以把他完全hide和disable掉
         4. 你可以拖動圖表，按住左鍵然後移動滑鼠，我設置默認的dragmode為pan，也可以改成別的
-        4. 你將滑鼠一到boxplot上的點時，可以立刻看到病人的ID和數值，這個資訊是可以改寫的，我目前就是放病人ID而已，要的話我還可以放很多你想放的資訊。
-        5. 每個圖右側的legend是可以點選的，可以將各自對應的資料hide起來,當然，也是把legend關掉，這樣就沒有hide的功能,app2、3、4的legend就是被我關掉的
+        4. 你將滑鼠移到boxplot上的點上面時，可以立刻看到病人的ID和數值，這個資訊是可以改寫的，我目前就是放病人ID而已，要的話我還可以放很多你想放的資訊。
+        5. 每個圖右側的legend是可以點選的，可以將各自對應的資料hide起來,當然，也是可以把legend關掉，這樣就沒有hide的功能。app2、3、4的legend就是被我關掉的
 
         #### 全部的圖表配置，版型、配色、間距、大小等，如有需要都可以在細部修改
 
@@ -246,13 +246,15 @@ def microbio_app2():
         當然,這個選單區的排版也還醜醜的,正式做的時候再修。
 
         ### 圖表
-        我關掉legend太花了
+        我關掉legend，太花了
 
         我額外加上默認的滾輪反應，你在任意一張圖表上滾滑鼠滾輪即可放大縮小,
 
         modebar的選單區被我hide掉幾個,測試我能不能關掉一些不太會用到的modebar
 
         圖還醜醜的,p值的呈現也醜醜的,之後再修
+
+        您的資料中物種名稱有些沒有種名，因此你會看到有些的種名為nan，之後可能要改成sp.或spp.
 
         '''))],className='container'),
         html.Hr(),
@@ -327,10 +329,9 @@ def microbio_app3():
         html.H2('APP3'),
         html.H4("說明",style={'color':'#e2598b'}),
         dcc.Markdown(dedent('''
+        你的說明只有提到Genus level top 15,所以我假設是將同個Genus底下的物種百分比加總，然後再以這個百分比來挑選> 0.3%、
+        且計算 one way anova 的p值，一樣我暫時將p值得門檻上限拉到0.5，再將前15丟上來畫圖
 
-        ### 你的說明只有提到Genus level top 15,所以我假設是將同個Genus底下的物種百分比加種，然後在以這個百分比來挑選> 0.3%、
-        且計算 one way anova 的p值，一樣我暫時將p值得門檻上限拉到0.5
-        
         其餘選單區和圖表本身的說明如app2，我程式碼幾乎是照搬過來的
         ''')),
         html.Hr(),
@@ -405,44 +406,51 @@ def microbio_app4(all_pid):
         # main title
         html.H1(children='Microbiota Community Visualization',style={ 'text-align': 'center' }),
         html.P(children='author of this app: Even',style={ 'text-align': 'right' }),
-        html.H2('APP4'),
         html.Div([
+        html.H2('APP4'),
         html.H4("說明",style={'color':'#e2598b'}),
         dcc.Markdown(dedent('''
-        你提到要做血液資料視覺化,但是之後有可能會有很多很多的病人都要show這個圖,所以我目前是只放四個圖,各圖做個下拉式選單
-        讓使用者能選這個圖要呈現誰的資料
+        你提到要做血液資料視覺化,但是之後有可能會有很多很多的病人都要show這個圖，我不知道到底要一口氣畫多少張圖上去,
+        所以我目前是只放四個圖,做個下拉式選單，讓使用者能選這個圖要呈現誰的資料
 
         ### 圖表
         我目前使用3個y來呈現這個圖，一些排版還要再修（如：y3的axis label會擋到），總之，只是demo
+        legend可以點喔
 
         ### 資料庫連動
-        這是唯一有和資料庫做連動的圖表，其他我模前都只是計算產出plot_data的excel檔，在畫圖
+        這是唯一有和資料庫做連動的圖表，其他我的app都只是拿你給我的excel檔，計算產出plot_data的excel檔，從load這些plot_data再畫圖
+        ,之後在世做全部都要連進資料庫里
 
-        你可以去後台更新,新增病人基本資料,在新增血液資料,然後這個app的選單區終究會直接都出一個選項
+        你可以去後台更新,新增病人基本資料,再新增該病人的血液資料,然後這個app的下拉式選單中就會直接多出一個選項
 
+        我目前還沒編寫一些例外處理的的程式，因此你資料庫動一動這個app只要狀況不對就會掛掉(例如：新增了病人資料卻沒有新增血液資料)，
+        正式要做的時候在幫你們設想這些一大堆的例外狀況怎麼處理吧
         ''')),
+        html.A('後台入口', href='/admin', className = 'btn btn-primary'),
         ],className='container'),
         html.Hr(),
         # plot 4 section
         html.Div(children=[
-            html.P('左上選單',className='col-3'),
-            html.P('右上選單',className='col-3'),
-            html.P('左下選單',className='col-3'),
-            html.P('右上選單',className='col-3'),
+            html.P('圖1',className='col-6'),
+            html.P('圖2',className='col-6'),
         ],className='row'),
         html.Div(children=[
-            html.Div(dcc.Dropdown(id='f1 dropdown',options=pid_options,value=all_pid[0],placeholder="Select a patient"),className='col-3'),
-            html.Div(dcc.Dropdown(id='f2 dropdown',options=pid_options,value=all_pid[1],placeholder="Select a patient"),className='col-3'),
-            html.Div(dcc.Dropdown(id='f3 dropdown',options=pid_options,value=all_pid[2],placeholder="Select a patient"),className='col-3'),
-            html.Div(dcc.Dropdown(id='f4 dropdown',options=pid_options,value=all_pid[3],placeholder="Select a patient"),className='col-3'),
+            html.Div(dcc.Dropdown(id='f1 dropdown',options=pid_options,value=all_pid[0],placeholder="Select a patient"),className='col-6'),
+            html.Div(dcc.Dropdown(id='f2 dropdown',options=pid_options,value=all_pid[1],placeholder="Select a patient"),className='col-6'),
         ],className='row'),
-        # plot 4 menu
-        html.H4("I guess there is no need to add interaction menus??"),
-        html.P("Since there are so many patient, why not let the users to pick four? they what to see"),
         # plot 4 draw region
         html.Div([
             html.Div(id='f1', children=dcc.Graph(figure=utils.draw_blood_data(all_pid[0])),className='col-6'),
             html.Div(id='f2', children=dcc.Graph(figure=utils.draw_blood_data(all_pid[1])),className='col-6'),
+        ],className='row'),
+        html.Br(),
+        html.Div(children=[
+            html.P('圖3',className='col-6'),
+            html.P('圖4',className='col-6'),
+        ],className='row'),
+        html.Div(children=[
+            html.Div(dcc.Dropdown(id='f3 dropdown',options=pid_options,value=all_pid[2],placeholder="Select a patient"),className='col-6'),
+            html.Div(dcc.Dropdown(id='f4 dropdown',options=pid_options,value=all_pid[3],placeholder="Select a patient"),className='col-6'),
         ],className='row'),
         html.Div([
             html.Div(id='f3', children=dcc.Graph(figure=utils.draw_blood_data(all_pid[2])),className='col-6'),
@@ -563,6 +571,12 @@ def home():
 
         我的程式碼一律公開，這裡面沒有你們的資料，放心：
         https://github.com/even311379/microbio_demo
+
+
+        #### 我的聯絡方式
+        * email: even311379@hotmail.com
+        * phone: 0989914039
+        * 個人網站： https://freelancerlife.info
         ''')),
         
     ], className="container bg-light")
